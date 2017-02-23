@@ -8,6 +8,11 @@
 
 
 #import packages
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import matplotlib
+import os
 
 
 
@@ -36,23 +41,17 @@ for t in range(101):
     Long_term_investment.append(Long_term_bonds.CalculateInvestment(t))
 print([period,Short_term_investment,Long_term_investment])
 
-#Plot Investement Evaluation
-import plotly.plotly as py
-import plotly.graph_objs as go
+#optional style
+matplotlib.style.use('ggplot')
 
-# Create random data with numpy
+plt.plot(period, Short_term_investment)
+plt.plot(period, Long_term_investment)
+plt.legend(['Short term', 'Long term'], loc='upper left')
+plt.xlabel('Period')
+plt.ylabel('Investment')
+plt.title('Investment Revolution')
+plt.grid(True)
+plt.savefig(os.path.abspath('./BondsRevolution.png'))
+plt.show()
 
-
-N = 500
-random_x = [0,1,2,3,4,5,6,7,8]
-random_y = [8,7,6,5,4,3,2,1,0]
-
-# Create a trace
-trace = go.Scatter(
-    x = random_x,
-    y = random_y
-)
-
-data = [trace]
-
-py.iplot(data, filename='basic-line')
+##############Create Stocks#############
