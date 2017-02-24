@@ -72,7 +72,7 @@ Stock_YHOO = pd.read_csv('.\Data\YHOO.csv', sep=';')
 
 #keep only date and high columns
 AAPL  = Stock_AAPL[['Date','High']]
-AAPL.High = AAPL
+AAPL.rename(columns={'High': 'AAPL'}, inplace=True)
 print(AAPL.head())
 AXP  = Stock_AXP[['Date','High']]
 AXP.rename(columns={'High': 'AXP'}, inplace=True)
