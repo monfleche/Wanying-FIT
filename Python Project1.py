@@ -9,13 +9,14 @@
 
 # import packages
 
-import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import matplotlib
 import os
-
-
+import datetime
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib import style
+from random import randint
 
 ##############Create Bonds#############
 
@@ -41,10 +42,11 @@ for t in range(101):
     period.append(t)
     Short_term_investment.append(Short_term_bonds.CalculateInvestment(t))
     Long_term_investment.append(Long_term_bonds.CalculateInvestment(t))
-print([period, Short_term_investment, Long_term_investment])
+#print([period, Short_term_investment, Long_term_investment])
 
+################## PLOT ###################
 # optional style
-# matplotlib.style.use('ggplot')
+# matplotlib.style.use('ggplot')#
 
 # plt.plot(period, Short_term_investment)
 # plt.plot(period, Long_term_investment)
@@ -56,68 +58,83 @@ print([period, Short_term_investment, Long_term_investment])
 # plt.savefig(os.path.abspath('./BondsRevolution.png'))
 # plt.show()
 
+
+################################################################################################################################
+
 ##############Create Stocks#############
 
-Stock_AAPL = pd.read_csv('.\Data\AAPL.csv', sep=';')
-#print(Stock_AAPL)
-Stock_AXP = pd.read_csv('.\Data\AXP.csv', sep=';')
-Stock_FDX = pd.read_csv('.\Data\FDX.csv', sep=';')
-Stock_GOOGL = pd.read_csv('.\Data\GOOGL.csv', sep=';')
-Stock_IBM = pd.read_csv('.\Data\IBM.csv', sep=';')
-Stock_KO = pd.read_csv('.\Data\KO.csv', sep=';') #Import issue, change de file name manually
-Stock_MS = pd.read_csv('.\Data\MS.csv', sep=';')
-Stock_NOK = pd.read_csv('.\Data\K.csv', sep=';')
-Stock_XOM = pd.read_csv('.\Data\XOM.csv', sep=';')
-Stock_YHOO = pd.read_csv('.\Data\YHOO.csv', sep=';')
+Stock_AAPL = pd.read_csv('.\Data\AAPL.csv', sep=';',parse_dates=['Date'])
+Stock_AXP = pd.read_csv('.\Data\AXP.csv', sep=';',parse_dates=['Date'])
+Stock_FDX = pd.read_csv('.\Data\FDX.csv', sep=';',parse_dates=['Date'])
+Stock_GOOGL = pd.read_csv('.\Data\GOOGL.csv', sep=';',parse_dates=['Date'])
+Stock_IBM = pd.read_csv('.\Data\IBM.csv', sep=';',parse_dates=['Date'])
+Stock_KO = pd.read_csv('.\Data\KO.csv', sep=';',parse_dates=['Date'])
+Stock_MS = pd.read_csv('.\Data\MS.csv', sep=';',parse_dates=['Date'])
+Stock_NOK = pd.read_csv('.\Data\K.csv', sep=';',parse_dates=['Date'])#Import issue, change de file name manually
+Stock_XOM = pd.read_csv('.\Data\XOM.csv', sep=';',parse_dates=['Date'])
+Stock_YHOO = pd.read_csv('.\Data\YHOO.csv', sep=';',parse_dates=['Date'])
+#print(Stock_GOOGL)
+STOCK=[Stock_AAPL,Stock_AXP, Stock_FDX, Stock_GOOGL, Stock_IBM, Stock_KO, Stock_MS, Stock_NOK, Stock_XOM, Stock_YHOO]
+#print(STOCK[0])
 
-#keep only date and high columns
-AAPL  = Stock_AAPL[['Date','High']]
-AAPL.rename(columns={'High': 'AAPL'}, inplace=True)
-print(AAPL.head())
-AXP  = Stock_AXP[['Date','High']]
-AXP.rename(columns={'High': 'AXP'}, inplace=True)
-#print(AXP)
-FDX  = Stock_FDX[['Date','High']]
-FDX.rename(columns={'High': 'FDX'}, inplace=True)
-GOOGL  = Stock_GOOGL[['Date','High']]
-GOOGL.rename(columns={'High': 'GOOGL'}, inplace=True)
-IBM  = Stock_IBM[['Date','High']]
-IBM.rename(columns={'High': 'IBM'}, inplace=True)
-KO  = Stock_KO[['Date','High']]
-KO.rename(columns={'High': 'KO'}, inplace=True)
-MS  = Stock_MS[['Date','High']]
-MS.rename(columns={'High': 'MS'}, inplace=True)
-NOK  = Stock_NOK[['Date','High']]
-NOK.rename(columns={'High': 'NOK'}, inplace=True)
-XOM  = Stock_XOM[['Date','High']]
-XOM.rename(columns={'High': 'XOM'}, inplace=True)
-YHOO  = Stock_YHOO[['Date','High']]
-YHOO.rename(columns={'High': 'YHOO'}, inplace=True)
+#print(pd.Timestamp('20140125').date())
 
 
-#FDX, GOOGL, IBM, KO, MS, NOK, XOM, YHOO,
-DATA=pd.merge(AAPL, AXP,  on='Date')
-DATA=pd.merge(DATA, FDX, on='Date')
-DATA=pd.merge(DATA, GOOGL,  on='Date')
-DATA=pd.merge(DATA, IBM,  on='Date')
-DATA=pd.merge(DATA, KO,  on='Date')
-DATA=pd.merge(DATA, MS,  on='Date')
-DATA=pd.merge(DATA, NOK,  on='Date')
-DATA=pd.merge(DATA, XOM,  on='Date')
-STOCK=pd.merge(DATA, YHOO,  on='Date')
-pd.set_option('display.max_rows', None)
-print(type(STOCK['Date']))
+print(Stock_AAPL[(Stock_AAPL['Date'] == pd.Timestamp(20050103))])
+def stock_return(stock, startday, endday):
+    buyprice=stock[(stock['Date']==pd.Timestamp(startday).date())]['High']
+    sellprice=stock[(stock['Date']==pd.Timestamp(endday).date())]['High']
+    return (sellprice-buyprice)/buyprice
 
+print('return =' )
+print(stock_return(Stock_AAPL, '20050301', '20050301'))
 
-#make a plot of all stock during the period
-#matplotlib.style.use('ggplot')
+################## PLOT ###################
+matplotlib.style.use('ggplot')
 
-#plt.plot(STOCK['Date'], STOCK['AAPL'])
-#plt.plot(period, Long_term_investment)
-#plt.legend(['AAPL'], loc='upper left')
-#plt.xlabel('Period')
-#plt.ylabel('Stock')
-#plt.title('Stock Price Evolution')
-#plt.grid(True)
-#plt.savefig(os.path.abspath('./Stock.png'))
+plt.plot(Stock_AAPL['Date'], Stock_AAPL['High'])
+plt.plot(Stock_AXP['Date'], Stock_AXP['High'])
+plt.plot(Stock_FDX['Date'], Stock_FDX['High'])
+plt.plot(Stock_GOOGL['Date'], Stock_GOOGL['High'])
+plt.plot(Stock_IBM['Date'], Stock_IBM['High'])
+plt.plot(Stock_KO['Date'], Stock_KO['High'])
+plt.plot(Stock_MS['Date'], Stock_MS['High'])
+plt.plot(Stock_NOK['Date'], Stock_NOK['High'])
+plt.plot(Stock_XOM['Date'], Stock_XOM['High'])
+plt.plot(Stock_YHOO['Date'], Stock_YHOO['High'])
+
+plt.legend(['AAPL', 'AXP', 'FDX', 'GOOGL', 'IBM', 'KO', 'MS', 'NOK', 'XOM', 'YHOO'], loc='upper left')
+
+plt.xlabel('Period')
+plt.ylabel('StockPrice')
+plt.title('Stock Price Evolution')
+plt.grid(True)
+plt.savefig(os.path.abspath('./Stock.png'))
 #plt.show()
+
+#############################################################################################################################################################
+
+############Creat Investor########################
+
+
+class ListInvestor(object):
+    def __init__(self, budget, mode):
+        self.budget = budget
+        self.mode = mode
+
+    def defensive_Investement(self, period):
+        short_term = self.budget * float(randint(1, 10) / 10)
+        long_term = self.budget - short_term
+        if long_term % 2000 != 0:
+            short_term = short_term + 1000
+            long_term = long_term - 1000
+        return short_term * (1 + Short_term_bonds.yearly_interest_rate) ** period + long_term * (1 + Long_term_bonds.yearly_interest_rate) ** period
+
+
+
+
+
+Defensive = ListInvestor(12000, 'defensive')
+Aggressive = ListInvestor(12000, 'aggressive')
+
+#print(Defensive.defensive_Investement(10))
