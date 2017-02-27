@@ -74,20 +74,27 @@ Stock_NOK = pd.read_csv('.\Data\K.csv', sep=';',parse_dates=['Date'])#Import iss
 Stock_XOM = pd.read_csv('.\Data\XOM.csv', sep=';',parse_dates=['Date'])
 Stock_YHOO = pd.read_csv('.\Data\YHOO.csv', sep=';',parse_dates=['Date'])
 #print(Stock_GOOGL)
+
+
+#print(Stock_AAPL)
 STOCK=[Stock_AAPL,Stock_AXP, Stock_FDX, Stock_GOOGL, Stock_IBM, Stock_KO, Stock_MS, Stock_NOK, Stock_XOM, Stock_YHOO]
 #print(STOCK[0])
 
-#print(pd.Timestamp('20140125').date())
-
-
-print(Stock_AAPL[(Stock_AAPL['Date'] == pd.Timestamp(20050103))])
+#write a function to calculate stock returns
 def stock_return(stock, startday, endday):
-    buyprice=stock[(stock['Date']==pd.Timestamp(startday).date())]['High']
-    sellprice=stock[(stock['Date']==pd.Timestamp(endday).date())]['High']
+    startday = pd.Timestamp(startday).date()
+    endday = pd.Timestamp(endday).date()
+    while not (Stock_AAPL['Date']==startday).any():
+        startday = startday + datetime.timedelta(days=1)
+    while not (Stock_AAPL['Date']==endday).any():
+        endday=endday + datetime.timedelta(days=1)
+    buyprice=float(stock[(stock['Date']==startday)]['High'])
+    sellprice=float(stock[(stock['Date']==endday)]['High'])
     return (sellprice-buyprice)/buyprice
 
-print('return =' )
-print(stock_return(Stock_AAPL, '20050301', '20050301'))
+#print(stock_return(Stock_AAPL.dataframe, '20050103', '20050108'))
+
+
 
 ################## PLOT ###################
 matplotlib.style.use('ggplot')
@@ -110,12 +117,14 @@ plt.ylabel('StockPrice')
 plt.title('Stock Price Evolution')
 plt.grid(True)
 plt.savefig(os.path.abspath('./Stock.png'))
-#plt.show()
+plt.show()
 
 #############################################################################################################################################################
-
 ############Creat Investor########################
-
+class Investment(object):
+    def __init__(self, stock, amount):
+        self.stock=stock
+        self.amount=amount
 
 class ListInvestor(object):
     def __init__(self, budget, mode):
@@ -130,11 +139,30 @@ class ListInvestor(object):
             long_term = long_term - 1000
         return short_term * (1 + Short_term_bonds.yearly_interest_rate) ** period + long_term * (1 + Long_term_bonds.yearly_interest_rate) ** period
 
-
-
+    def aggressive_Investment(self, startday, endday):
+        Investment=[]
+        start= pd.Timestamp(startday).date()
+        end= pd.Timestamp(endday).date()
+        while not (Stock_AAPL['Date'] == start).any():
+            start = start + datetime.timedelta(days=1)
+        while not (Stock_AAPL['Date'] ==end).any():
+            end = end + datetime.timedelta(days=1)
+        while self.budget>100:
+            rnd=randint(0,9)
+            print(rnd)
+            price = float(STOCK[rnd][(STOCK[rnd]['Date'] == start)]['High'])
+            volume=randint(1,int(self.budget/price/2+1))
+            Investment.append([rnd,volume*price, stock_return(STOCK[rnd],startday,endday)])
+            self.budget=self.budget-volume*price
+            print(self.budget)
+        Investment = pd.DataFrame(Investment)
+        print("first part finished")
+        # df = df.transpose()
+        Investment.columns = ['Stock', 'Amount', 'Return']
+        return Investment
 
 
 Defensive = ListInvestor(12000, 'defensive')
 Aggressive = ListInvestor(12000, 'aggressive')
 
-#print(Defensive.defensive_Investement(10))
+print(Aggressive.aggressive_Investment('20050103','20050108'))
