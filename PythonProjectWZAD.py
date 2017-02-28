@@ -94,7 +94,7 @@ def stock_return(stock, startday, endday):
     sellprice=float(stock[(stock['Date']==endday)]['High'])
     return (sellprice-buyprice)/buyprice
 
-#print(stock_return(Stock_AAPL, '20050103', '20050108'))
+print(stock_return(Stock_AAPL, '20050103', '20050108'))
 
 
 
@@ -131,7 +131,6 @@ class ListInvestor(object):
         self.start=start
 
 class Defensive(ListInvestor):
-
     def defensive_Investement(self, startday, endday):
         self.budget = self.start
         start = pd.Timestamp(startday).date()
@@ -144,9 +143,9 @@ class Defensive(ListInvestor):
                 long_term = long_term - 1000
             return short_term * ((1 + Short_term_bonds.yearly_interest_rate) ** ((end-start).days/360)) + long_term * ((1 + Long_term_bonds.yearly_interest_rate) ** ((end-start).days/360))
         elif (end-start).days/360 > Short_term_bonds.minimum_term:
-            short_term=self.budget
+            short_term = self.budget
             return short_term * ((1 + Short_term_bonds.yearly_interest_rate) ** ((end-start).days/360))
-        else :
+        else:
             return 0
 
 # Create a list of 1000 defensive investors
@@ -184,9 +183,6 @@ AggressiveInvestor = dict()
 for i in range(1, 1001):
     AggressiveInvestor[i] = Aggressive(12000, 'Aggressive',12000)
 #print(AggressiveInvestor[1000].budget)
-print( AggressiveInvestor[1].aggressive_Investment('20050101','20060101'))
-
-print( DefensiveInvestor[1000].defensive_Investment('20050101','20060101'))
 
 class Mixed(ListInvestor):
     def mixed_Investment(self, startday, endday):
@@ -250,6 +246,8 @@ for i in range(1, 1001):
     MixedInvestor[i] = Mixed(12000, 'Mixed', 12000)
 #print(DefensiveInvestor[1000].budget)
 print(MixedInvestor[1000].mixed_Investment('20050103','20150108'))
+print(AggressiveInvestor[1].aggressive_Investment('20050101','20060101'))
+print(DefensiveInvestor[1000].defensive_Investement('20050101','20060101'))
 
 #############################################################################################################################################################################
 #############################################################################################################################################################################
