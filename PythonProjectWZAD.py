@@ -53,14 +53,14 @@ for t in range(101):
 matplotlib.style.use('ggplot')#
 
 plt.plot(period, Short_term_investment)
- plt.plot(period, Long_term_investment)
- plt.legend(['Short term', 'Long term'], loc='upper left')
- plt.xlabel('Period')
- plt.ylabel('Investment')
- plt.title('Investment Evolution')
- plt.grid(True)
- plt.savefig(os.path.abspath('./BondsRevolution.png'))
- plt.show()
+plt.plot(period, Long_term_investment)
+plt.legend(['Short term', 'Long term'], loc='upper left')
+plt.xlabel('Period')
+plt.ylabel('Investment')
+plt.title('Investment Evolution')
+plt.grid(True)
+plt.savefig(os.path.abspath('./BondsRevolution.png'))
+plt.show()
 
 
 ################################################################################################################################
@@ -184,9 +184,9 @@ AggressiveInvestor = dict()
 for i in range(1, 1001):
     AggressiveInvestor[i] = Aggressive(12000, 'Aggressive',12000)
 #print(AggressiveInvestor[1000].budget)
-#print( AggressiveInvestor[1].aggressive_Investment('20050101','20060101'))
+print( AggressiveInvestor[1].aggressive_Investment('20050101','20060101'))
 
-
+print( DefensiveInvestor[1000].defensive_Investment('20050101','20060101'))
 
 class Mixed(ListInvestor):
     def mixed_Investment(self, startday, endday):
@@ -249,7 +249,7 @@ MixedInvestor = dict()
 for i in range(1, 1001):
     MixedInvestor[i] = Mixed(12000, 'Mixed', 12000)
 #print(DefensiveInvestor[1000].budget)
-#print(MixedInvestor[1000].mixed_Investment('20050103','20150108'))
+print(MixedInvestor[1000].mixed_Investment('20050103','20150108'))
 
 #############################################################################################################################################################################
 #############################################################################################################################################################################
