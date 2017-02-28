@@ -81,7 +81,10 @@ Stock_YHOO = pd.read_csv('.\Data\YHOO.csv', sep=';',parse_dates=['Date'])
 
 
 #print(Stock_AAPL)
+
 STOCK=[Stock_AAPL,Stock_AXP, Stock_FDX, Stock_GOOGL, Stock_IBM, Stock_KO, Stock_MS, Stock_NOK, Stock_XOM, Stock_YHOO]
+
+
 #print(STOCK[0])
 
 #write a function to calculate stock returns
@@ -96,7 +99,7 @@ def stock_return(stock, startday, endday):
     sellprice=float(stock[(stock['Date']==endday)]['High'])
     return (sellprice-buyprice)/buyprice
 
-#print(stock_return(Stock_AAPL.dataframe, '20050103', '20050108'))
+#print(stock_return(Stock_AAPL, '20050103', '20050108'))
 
 
 
