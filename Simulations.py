@@ -70,8 +70,7 @@ layout = dict(title = 'Investment of three Investor types ',
               yaxis = dict(title = 'Investment'),
               )
 fig = dict(data=data, layout=layout)
-plotly.offline.plot(fig, filename='Investment.png')
-
+plotly.offline.plot(fig, filename='Investment.html')
 
 
 
@@ -140,7 +139,7 @@ layout = dict(title = 'Investment with larger budget',
               yaxis = dict(title = 'Investment'),
               )
 fig = dict(data=data, layout=layout)
-plotly.offline.plot(fig, filename='Investment with larger budget.png')
+plotly.offline.plot(fig, filename='Investment with larger budget.html')
 
 
 
@@ -213,7 +212,7 @@ layout = dict(title = 'Investment with Random budget',
               yaxis = dict(title = 'Investment'),
               )
 fig = dict(data=data, layout=layout)
-plotly.offline.plot(fig, filename='Investment with Random budget.png')
+plotly.offline.plot(fig, filename='Investment with Random budget.html')
 
 ################################################################################################################################################################
 ##############select the best stock on 2017
