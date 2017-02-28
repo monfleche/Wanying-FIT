@@ -12,11 +12,15 @@
 import pandas as pd
 import numpy as np
 import os
+import dis
 import datetime
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib import style
 from random import randint
+from datetime import date
+
+
 
 ##############Create Bonds#############
 
@@ -117,28 +121,45 @@ plt.ylabel('StockPrice')
 plt.title('Stock Price Evolution')
 plt.grid(True)
 plt.savefig(os.path.abspath('./Stock.png'))
-plt.show()
+#plt.show()
 
 #############################################################################################################################################################
 ############Creat Investor########################
-class Investment(object):
-    def __init__(self, stock, amount):
-        self.stock=stock
-        self.amount=amount
 
 class ListInvestor(object):
-    def __init__(self, budget, mode):
+    def __init__(self, budget, type):
         self.budget = budget
-        self.mode = mode
+        self.type = type
 
-    def defensive_Investement(self, period):
-        short_term = self.budget * float(randint(1, 10) / 10)
-        long_term = self.budget - short_term
-        if long_term % 2000 != 0:
-            short_term = short_term + 1000
-            long_term = long_term - 1000
-        return short_term * (1 + Short_term_bonds.yearly_interest_rate) ** period + long_term * (1 + Long_term_bonds.yearly_interest_rate) ** period
+class Defensive(ListInvestor):
+    def defensive_Investement(self, startday, endday):
+        start = pd.Timestamp(startday).date()
+        end = pd.Timestamp(endday).date()
+        print(start)
+        print((end-start).days)
+        if (end-start).days/365>Long_term_bonds.minimum_term:
+            short_term = self.budget * float(randint(1, 10) / 10)
+            long_term = self.budget - short_term
+            if long_term % 2000 != 0:
+                short_term = short_term + 1000
+                long_term = long_term - 1000
+            return (end-start).days/365, short_term * (1 + Short_term_bonds.yearly_interest_rate) ** (end-start).days/365 + long_term * (1 + Long_term_bonds.yearly_interest_rate) ** (end-start).days/365
+        elif (end-start).days/365 > Short_term_bonds.minimum_term:
+            short_term=self.budget
+            return (end-start).days/365, short_term * (1 + Short_term_bonds.yearly_interest_rate) ** (end-start).days/365
 
+# Create a list of 1000 defensive investors
+DefensiveInvestor = dict()
+for i in range(1, 1001):
+    DefensiveInvestor[i] = Defensive(12000, 'Defensive')
+#print(DefensiveInvestor[999].budget)
+
+
+
+
+
+#Class name Aggressive
+class Aggressive(ListInvestor):
     def aggressive_Investment(self, startday, endday):
         Investment=[]
         start= pd.Timestamp(startday).date()
@@ -151,18 +172,69 @@ class ListInvestor(object):
             rnd=randint(0,9)
             print(rnd)
             price = float(STOCK[rnd][(STOCK[rnd]['Date'] == start)]['High'])
-            volume=randint(1,int(self.budget/price/2+1))
+            volume=randint(1,int(self.budget/price/2))
             Investment.append([rnd,volume*price, stock_return(STOCK[rnd],startday,endday)])
             self.budget=self.budget-volume*price
             print(self.budget)
         Investment = pd.DataFrame(Investment)
-        print("first part finished")
         # df = df.transpose()
         Investment.columns = ['Stock', 'Amount', 'Return']
         return Investment
 
+#Create a list of 1000 aggressive investors
+AggressiveInvestor = dict()
+for i in range(1, 1001):
+    AggressiveInvestor[i] = Aggressive(12000, 'Defensive')
+print(AggressiveInvestor[1000].budget)
 
-Defensive = ListInvestor(12000, 'defensive')
-Aggressive = ListInvestor(12000, 'aggressive')
+class Mixed(ListInvestor):
+    def mixed_Investemtn(self, startday, endday):
+        Investment=[]
+        start = pd.Timestamp(startday).date()
+        end = pd.Timestamp(endday).date()
+        while self.budget>Short_term_bonds.minimum_amount:
+            rnd=randint(0,1)
+            print(rnd)
+            if rnd==0:
+                rnd=randint(0,1)
+                if rnd==0:
+                 Investment.append(["ShortTermBond", Short_term_bonds.minimum_amount * (1 + Short_term_bonds.yearly_interest_rate) ** (end - start).days/365])
+                 self.budget = self.budget- Short_term_bonds.minimum_amount
+                 print('Short term bonds')
+                 print(self.budget)
+                else:
+                 Investment.append(["LongTermBond", Long_term_bonds.minimum_amount * (1 + Long_term_bonds.yearly_interest_rate) ** (end - start).days / 365])
+                 self.budget = self.budget- Long_term_bonds.minimum_amount
+                 print('Long term bonds')
+                 print(self.budget)
+            else:
+                while not (Stock_AAPL['Date'] == start).any():
+                    start = start + datetime.timedelta(days=1)
+                while not (Stock_AAPL['Date'] == end).any():
+                    end = end + datetime.timedelta(days=1)
+                rnd = randint(0, 9)
+                price = float(STOCK[rnd][(STOCK[rnd]['Date'] == start)]['High'])
+                volume = randint(1, int(self.budget / price / 2 + 1))
+                Investment.append(["Stock",volume * price*(1+ stock_return(STOCK[rnd], startday, endday))])
+                self.budget = self.budget- volume * price
+                print('Stock')
+                print(self.budget)
+        Investment = pd.DataFrame(Investment)
+        Investment.columns = ['Type','Investment']
+        return Investment
 
-print(Aggressive.aggressive_Investment('20050103','20050108'))
+MixedInvestor = dict()
+for i in range(1, 1001):
+    MixedInvestor[i] = Mixed(12000, 'Defensive')
+#print(DefensiveInvestor[999].budget)
+
+
+
+
+
+
+
+#print(MixedInvestor[1000].mixed_Investemtn('20050103','20150108'))
+
+#############################################################################################################################################################################
+#############################################################################################################################################################################

@@ -1,0 +1,1 @@
+print(DefensiveInvestor[999].budget)
