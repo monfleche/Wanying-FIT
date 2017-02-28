@@ -49,18 +49,18 @@ for t in range(101):
 #print([period, Short_term_investment, Long_term_investment])
 
 ################## PLOT ###################
-# optional style
-# matplotlib.style.use('ggplot')#
+#optional style
+matplotlib.style.use('ggplot')#
 
-# plt.plot(period, Short_term_investment)
-# plt.plot(period, Long_term_investment)
-# plt.legend(['Short term', 'Long term'], loc='upper left')
-# plt.xlabel('Period')
-# plt.ylabel('Investment')
-# plt.title('Investment Evolution')
-# plt.grid(True)
-# plt.savefig(os.path.abspath('./BondsRevolution.png'))
-# plt.show()
+plt.plot(period, Short_term_investment)
+ plt.plot(period, Long_term_investment)
+ plt.legend(['Short term', 'Long term'], loc='upper left')
+ plt.xlabel('Period')
+ plt.ylabel('Investment')
+ plt.title('Investment Evolution')
+ plt.grid(True)
+ plt.savefig(os.path.abspath('./BondsRevolution.png'))
+ plt.show()
 
 
 ################################################################################################################################
@@ -79,12 +79,7 @@ Stock_XOM = pd.read_csv('.\Data\XOM.csv', sep=';',parse_dates=['Date'])
 Stock_YHOO = pd.read_csv('.\Data\YHOO.csv', sep=';',parse_dates=['Date'])
 #print(Stock_GOOGL)
 
-
-#print(Stock_AAPL)
-
 STOCK=[Stock_AAPL,Stock_AXP, Stock_FDX, Stock_GOOGL, Stock_IBM, Stock_KO, Stock_MS, Stock_NOK, Stock_XOM, Stock_YHOO]
-
-
 #print(STOCK[0])
 
 #write a function to calculate stock returns
@@ -124,7 +119,7 @@ plt.ylabel('StockPrice')
 plt.title('Stock Price Evolution')
 plt.grid(True)
 plt.savefig(os.path.abspath('./Stock.png'))
-#plt.show()
+plt.show()
 
 #############################################################################################################################################################
 ############Creat Investor########################
@@ -158,7 +153,7 @@ class Defensive(ListInvestor):
 DefensiveInvestor = dict()
 for i in range(1, 1001):
     DefensiveInvestor[i] = Defensive(12000, 'Defensive',12000)
-#print(DefensiveInvestor[999].budget)
+#print(DefensiveInvestor[1000].budget)
 
 
 
