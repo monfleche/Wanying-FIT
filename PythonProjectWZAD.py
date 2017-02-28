@@ -127,34 +127,34 @@ plt.savefig(os.path.abspath('./Stock.png'))
 ############Creat Investor########################
 
 class ListInvestor(object):
-    def __init__(self, budget, type):
+    def __init__(self, budget, type,start):
         self.budget = budget
         self.type = type
+        self.start=start
 
 class Defensive(ListInvestor):
 
     def defensive_Investement(self, startday, endday):
+        self.budget = self.start
         start = pd.Timestamp(startday).date()
         end = pd.Timestamp(endday).date()
-        print(start)
-        print((end-start).days)
-        if (end-start).days/365>Long_term_bonds.minimum_term:
+        if (end-start).days/360>Long_term_bonds.minimum_term:
             short_term = self.budget * float(randint(1, 10) / 10)
             long_term = self.budget - short_term
             if long_term % 2000 != 0:
                 short_term = short_term + 1000
                 long_term = long_term - 1000
-            return (end-start).days/365, short_term * ((1 + Short_term_bonds.yearly_interest_rate) ** ((end-start).days/365)) + long_term * ((1 + Long_term_bonds.yearly_interest_rate) ** ((end-start).days/365))
-        elif (end-start).days/365 > Short_term_bonds.minimum_term:
+            return short_term * ((1 + Short_term_bonds.yearly_interest_rate) ** ((end-start).days/360)) + long_term * ((1 + Long_term_bonds.yearly_interest_rate) ** ((end-start).days/360))
+        elif (end-start).days/360 > Short_term_bonds.minimum_term:
             short_term=self.budget
-            return short_term * ((1 + Short_term_bonds.yearly_interest_rate) ** ((end-start).days/365))
+            return short_term * ((1 + Short_term_bonds.yearly_interest_rate) ** ((end-start).days/360))
         else :
-            return print('Bond minimum term 2 years')
+            return 0
 
 # Create a list of 1000 defensive investors
 DefensiveInvestor = dict()
 for i in range(1, 1001):
-    DefensiveInvestor[i] = Defensive(12000, 'Defensive')
+    DefensiveInvestor[i] = Defensive(12000, 'Defensive',12000)
 #print(DefensiveInvestor[999].budget)
 
 
@@ -164,6 +164,7 @@ for i in range(1, 1001):
 #Class name Aggressive
 class Aggressive(ListInvestor):
     def aggressive_Investment(self, startday, endday):
+        self.budget = self.start
         Investment=[]
         start= pd.Timestamp(startday).date()
         end= pd.Timestamp(endday).date()
@@ -173,39 +174,38 @@ class Aggressive(ListInvestor):
             end = end + datetime.timedelta(days=1)
         while self.budget>100:
             rnd=randint(0,9)
-            print(rnd)
-            price = float(STOCK[rnd][(STOCK[rnd]['Date'] == start)]['High'])
-            volume=randint(1,int(self.budget/price/2))
-            Investment.append([rnd,volume*price, stock_return(STOCK[rnd],startday,endday)])
-            self.budget=self.budget-volume*price
-            print(self.budget)
-        Investment = pd.DataFrame(Investment)
-        # df = df.transpose()
-        Investment.columns = ['Stock', 'Amount', 'Return']
-
-        return sum(Investment['Amount']*Investment['Return'])
+            buyprice = float(STOCK[rnd][(STOCK[rnd]['Date'] == start)]['High'])
+            sellprice= float(STOCK[rnd][(STOCK[rnd]['Date'] == end)]['High'])
+            volume=randint(1,(int(self.budget/buyprice/2)+1))
+            Investment.append(volume*sellprice)
+            self.budget=self.budget-volume*buyprice
+        return sum(Investment)
 
 #Create a list of 1000 aggressive investors
 AggressiveInvestor = dict()
 for i in range(1, 1001):
-    AggressiveInvestor[i] = Aggressive(12000, 'Defensive')
+    AggressiveInvestor[i] = Aggressive(12000, 'Aggressive',12000)
 #print(AggressiveInvestor[1000].budget)
+#print( AggressiveInvestor[1].aggressive_Investment('20050101','20060101'))
+
+
 
 class Mixed(ListInvestor):
-    def mixed_Investemtn(self, startday, endday):
+    def mixed_Investment(self, startday, endday):
+        self.budget = self.start
         Investment=[]
         start = pd.Timestamp(startday).date()
         end = pd.Timestamp(endday).date()
         while self.budget>Short_term_bonds.minimum_amount:
-            if (end-start).days/365>Long_term_bonds.minimum_term:
+            if (end-start).days/360>Long_term_bonds.minimum_term:
                     rnd=randint(0,1)
                     if rnd==0:
                         rnd=randint(0,1)
                         if rnd==0:
-                         Investment.append(["ShortTermBond", Short_term_bonds.minimum_amount * ((1 + Short_term_bonds.yearly_interest_rate) ** ((end - start).days/365))])
+                         Investment.append(Short_term_bonds.minimum_amount * ((1 + Short_term_bonds.yearly_interest_rate) ** ((end - start).days/365)))
                          self.budget = self.budget- Short_term_bonds.minimum_amount
                         else:
-                         Investment.append(["LongTermBond", Long_term_bonds.minimum_amount * ((1 + Long_term_bonds.yearly_interest_rate) ** ((end - start).days / 365))])
+                         Investment.append(Long_term_bonds.minimum_amount * ((1 + Long_term_bonds.yearly_interest_rate) ** ((end - start).days / 365)))
                          self.budget = self.budget- Long_term_bonds.minimum_amount
                     else:
                         while not (Stock_AAPL['Date'] == start).any():
@@ -213,14 +213,15 @@ class Mixed(ListInvestor):
                         while not (Stock_AAPL['Date'] == end).any():
                             end = end + datetime.timedelta(days=1)
                         rnd = randint(0, 9)
-                        price = float(STOCK[rnd][(STOCK[rnd]['Date'] == start)]['High'])
-                        volume = randint(1, int(self.budget / price / 2 + 1))
-                        Investment.append(["Stock",volume * price*(1+ stock_return(STOCK[rnd], startday, endday))])
-                        self.budget = self.budget- volume * price
-            elif (end-start).days/365 > Short_term_bonds.minimum_term:
+                        buyprice = float(STOCK[rnd][(STOCK[rnd]['Date'] == start)]['High'])
+                        sellprice=float(STOCK[rnd][(STOCK[rnd]['Date'] == end)]['High'])
+                        volume = randint(1, int(self.budget / buyprice / 2 + 1))
+                        Investment.append(volume*sellprice)
+                        self.budget = self.budget- volume * buyprice
+            elif (end-start).days/360 > Short_term_bonds.minimum_term:
                 rnd = randint(0, 1)
                 if rnd == 0:
-                    Investment.append(["ShortTermBond", Short_term_bonds.minimum_amount * ((1 + Short_term_bonds.yearly_interest_rate) ** ((end - start).days / 365))])
+                    Investment.append(Short_term_bonds.minimum_amount * ((1 + Short_term_bonds.yearly_interest_rate) ** ((end - start).days / 360)))
                     self.budget = self.budget - Short_term_bonds.minimum_amount
                 else:
                     while not (Stock_AAPL['Date'] == start).any():
@@ -228,33 +229,29 @@ class Mixed(ListInvestor):
                     while not (Stock_AAPL['Date'] == end).any():
                         end = end + datetime.timedelta(days=1)
                     rnd = randint(0, 9)
-                    price = float(STOCK[rnd][(STOCK[rnd]['Date'] == start)]['High'])
-                    volume = randint(1, int(self.budget / price / 2 + 1))
-                    Investment.append(["Stock", volume * price * (1 + stock_return(STOCK[rnd], startday, endday))])
-                    self.budget = self.budget - volume * price
+                    buyprice = float(STOCK[rnd][(STOCK[rnd]['Date'] == start)]['High'])
+                    sellprice = float(STOCK[rnd][(STOCK[rnd]['Date'] == end)]['High'])
+                    volume = randint(1, int(self.budget / buyprice / 2 + 1))
+                    Investment.append(volume*sellprice)
+                    self.budget = self.budget - volume * buyprice
             else:
                 while not (Stock_AAPL['Date'] == start).any():
                     start = start + datetime.timedelta(days=1)
                 while not (Stock_AAPL['Date'] == end).any():
                     end = end + datetime.timedelta(days=1)
                 rnd = randint(0, 9)
-                price = float(STOCK[rnd][(STOCK[rnd]['Date'] == start)]['High'])
-                volume = randint(1, int(self.budget / price / 2 ))
-                Investment.append(["Stock", volume * price * (1 + stock_return(STOCK[rnd], startday, endday))])
-                self.budget = self.budget - volume * price
-        Investment = pd.DataFrame(Investment)
-        Investment.columns = ['Type', 'Investment']
-        return sum(Investment['Investment'])
+                buyprice = float(STOCK[rnd][(STOCK[rnd]['Date'] == start)]['High'])
+                sellprice = float(STOCK[rnd][(STOCK[rnd]['Date'] == end)]['High'])
+                volume = randint(1, int(self.budget / buyprice / 2 ))
+                Investment.append(volume*sellprice)
+                self.budget = self.budget - volume * buyprice
+        return sum(Investment)
 
 MixedInvestor = dict()
 for i in range(1, 1001):
-    MixedInvestor[i] = Mixed(12000, 'Defensive')
+    MixedInvestor[i] = Mixed(12000, 'Mixed', 12000)
 #print(DefensiveInvestor[1000].budget)
-
-
-
-
-print(MixedInvestor[1000].mixed_Investemtn('20050103','20150108'))
+#print(MixedInvestor[1000].mixed_Investment('20050103','20150108'))
 
 #############################################################################################################################################################################
 #############################################################################################################################################################################
